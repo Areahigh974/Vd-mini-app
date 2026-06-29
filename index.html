@@ -1,118 +1,159 @@
 <!DOCTYPE html>
-<html lang="my">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Myanmar 2D/3D Live</title>
-    <!-- Telegram Web App SDK -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <!-- Adsgram SDK -->
-    <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
+    <title>Video Stream Mini App</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
-<body>
-    <div id="app-container">
+<body class="dark-theme">
+    <!-- Channel Join Overlay -->
+    <div id="join-channel-overlay" class="overlay hidden">
+        <div class="overlay-content">
+            <i class="fab fa-telegram-plane"></i>
+            <h2>Join Our Channel</h2>
+            <p>Please join our Telegram channel to access all videos.</p>
+            <a href="#" id="tg-channel-link" target="_blank" class="btn primary">Join Channel</a>
+            <button id="check-join-btn" class="btn secondary">I've Joined</button>
+        </div>
+    </div>
+
+    <!-- Main App Container -->
+    <div id="app">
         <!-- Header -->
         <header>
             <div class="logo-container">
-                <div class="logo-icon">💰</div>
-                <h1>မြန်မာ 2D/3D</h1>
+                <img id="app-logo" src="https://via.placeholder.com/40" alt="Logo">
+                <span id="app-name">StreamMini</span>
             </div>
-            <div id="live-status" class="status-badge">Live</div>
+            <div class="user-info">
+                <span id="username">Guest</span>
+                <i class="fas fa-user-circle"></i>
+            </div>
         </header>
 
-        <!-- Main Content -->
-        <main>
-            <!-- 2D Section -->
-            <section class="result-card main-2d">
-                <div class="card-header">
-                    <h2>2D ရလဒ်</h2>
-                    <span id="current-time">--:--:--</span>
-                </div>
-                <div class="live-result-container">
-                    <div class="result-box">
-                        <span class="label">SET</span>
-                        <span id="live-set" class="value">0000.00</span>
-                    </div>
-                    <div class="result-box">
-                        <span class="label">VALUE</span>
-                        <span id="live-value" class="value">00000.00</span>
-                    </div>
-                </div>
-                <div class="big-number" id="live-2d">--</div>
-                <p class="update-info">နောက်ဆုံးရလဒ်: <span id="last-update">--:--</span></p>
-            </section>
-
-            <!-- 3D Section -->
-            <section class="result-card">
-                <div class="card-header">
-                    <h2>3D ရလဒ်</h2>
-                </div>
-                <div class="big-number-3d" id="live-3d">---</div>
-            </section>
-
-            <!-- Ad Slot Banner -->
-            <div class="ad-container" id="banner-ad">
-                <div id="adsgram-banner-container" class="ad-placeholder">ကြော်ငြာနေရာ (Banner)</div>
+        <!-- Navigation Bar (Top) -->
+        <nav class="top-nav">
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" id="search-input" placeholder="Search videos...">
             </div>
+        </nav>
 
-            <!-- Lucky Number Generator -->
-            <section class="action-card">
-                <h3>ကံစမ်းဂဏန်း ထုတ်ယူရန်</h3>
-                <div class="lucky-number-display" id="lucky-number">??</div>
-                <button id="generate-btn" class="primary-btn">ဂဏန်းထုတ်ယူမည်</button>
+        <!-- Page Content -->
+        <main id="main-content">
+            <!-- Home Page -->
+            <section id="home-page" class="page">
+                <!-- Top Ad -->
+                <div class="ad-container inline-ad" id="top-ad"></div>
+
+                <!-- Categories -->
+                <div class="categories-scroll">
+                    <div class="category active" data-category="all">All</div>
+                    <!-- Categories will be injected here -->
+                </div>
+
+                <!-- Sections -->
+                <div class="video-section" id="trending-section">
+                    <h3><i class="fas fa-fire"></i> Trending</h3>
+                    <div class="video-grid horizontal" id="trending-grid"></div>
+                </div>
+
+                <div class="video-section" id="latest-section">
+                    <h3><i class="fas fa-clock"></i> Latest</h3>
+                    <div class="video-grid" id="latest-grid"></div>
+                </div>
+
+                <div class="video-section" id="most-viewed-section">
+                    <h3><i class="fas fa-eye"></i> Most Viewed</h3>
+                    <div class="video-grid" id="most-viewed-grid"></div>
+                </div>
             </section>
 
-            <!-- Today's History -->
-            <section class="history-card">
-                <h3>ယနေ့ထွက်ဂဏန်းများ</h3>
-                <div class="history-grid">
-                    <div class="history-item">
-                        <span class="time">12:01 PM</span>
-                        <span class="number" id="history-1201">--</span>
+            <!-- Player Page -->
+            <section id="player-page" class="page hidden">
+                <div class="back-btn" onclick="app.goBack()">
+                    <i class="fas fa-arrow-left"></i> Back
+                </div>
+                
+                <div class="player-container">
+                    <div id="video-wrapper">
+                        <!-- Ad before play -->
+                        <div id="play-ad-overlay" class="play-ad hidden">
+                            <div class="ad-timer">Ad: <span id="ad-countdown">5</span>s</div>
+                            <div id="play-ad-content"></div>
+                        </div>
+                        <iframe id="video-iframe" src="" frameborder="0" allowfullscreen></iframe>
                     </div>
-                    <div class="history-item">
-                        <span class="time">04:30 PM</span>
-                        <span class="number" id="history-0430">--</span>
+                </div>
+
+                <div class="video-info">
+                    <h2 id="player-title">Video Title</h2>
+                    <div class="video-meta">
+                        <span id="player-views"><i class="fas fa-eye"></i> 0 views</span>
+                        <span id="player-date"><i class="fas fa-calendar"></i> 2 days ago</span>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button id="favorite-btn" class="btn-icon"><i class="far fa-heart"></i> Favorite</button>
+                        <button id="download-btn" class="btn-icon"><i class="fas fa-download"></i> Download</button>
+                    </div>
+
+                    <div class="tags-container" id="player-tags"></div>
+                    
+                    <div class="description-box">
+                        <p id="player-description">Description goes here...</p>
+                    </div>
+
+                    <!-- Overlay Ad -->
+                    <div class="ad-container overlay-ad" id="player-overlay-ad"></div>
+
+                    <div class="comments-section">
+                        <h3>Comments</h3>
+                        <div class="comment-input">
+                            <input type="text" id="new-comment" placeholder="Add a comment...">
+                            <button id="post-comment"><i class="fas fa-paper-plane"></i></button>
+                        </div>
+                        <div id="comments-list"></div>
+                    </div>
+
+                    <div class="related-section">
+                        <h3>Related Videos</h3>
+                        <div class="video-grid" id="related-grid"></div>
                     </div>
                 </div>
             </section>
 
-            <!-- Past 7 Days -->
-            <section class="table-card">
-                <h3>ပြီးခဲ့သော ၇ ရက် ရလဒ်များ</h3>
-                <div class="table-responsive">
-                    <table id="past-results-table">
-                        <thead>
-                            <tr>
-                                <th>နေ့စွဲ</th>
-                                <th>12:01</th>
-                                <th>04:30</th>
-                            </tr>
-                        </thead>
-                        <tbody id="past-results-body">
-                            <!-- Data will be injected here -->
-                        </tbody>
-                    </table>
-                </div>
+            <!-- Favorites Page -->
+            <section id="favorites-page" class="page hidden">
+                <h3>My Favorites</h3>
+                <div class="video-grid" id="favorites-grid"></div>
+            </section>
+
+            <!-- History Page -->
+            <section id="history-page" class="page hidden">
+                <h3>Watch History</h3>
+                <div class="video-grid" id="history-grid"></div>
             </section>
         </main>
 
-        <!-- Footer Ad -->
-        <footer>
-            <div class="ad-container" id="footer-ad">
-                <div class="ad-placeholder">Adsgram Reward Ad အား ဤနေရာတွင် ထည့်သွင်းနိုင်သည်</div>
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <div class="nav-item active" data-page="home-page">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
             </div>
-        </footer>
-
-        <!-- Loading Overlay -->
-        <div id="loading-overlay" class="hidden">
-            <div class="spinner"></div>
-            <p>ခေတ္တစောင့်ဆိုင်းပါ...</p>
-        </div>
+            <div class="nav-item" data-page="favorites-page">
+                <i class="fas fa-heart"></i>
+                <span>Favorites</span>
+            </div>
+            <div class="nav-item" data-page="history-page">
+                <i class="fas fa-history"></i>
+                <span>History</span>
+            </div>
+        </nav>
     </div>
 
     <script src="app.js"></script>

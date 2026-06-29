@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - StreamMini</title>
+    <link rel="stylesheet" href="admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="admin-body">
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-user-shield"></i>
+                <span>Admin Panel</span>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-link active" data-tab="dashboard-tab"><i class="fas fa-tachometer-alt"></i> Dashboard</div>
+                <div class="nav-link" data-tab="add-video-tab"><i class="fas fa-plus-circle"></i> Add Video</div>
+                <div class="nav-link" data-tab="manage-videos-tab"><i class="fas fa-tasks"></i> Manage Videos</div>
+                <div class="nav-link" data-tab="ads-tab"><i class="fas fa-ad"></i> Ads Control</div>
+                <div class="nav-link" data-tab="settings-tab"><i class="fas fa-cog"></i> Settings</div>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="index.html" class="btn-view-app"><i class="fas fa-external-link-alt"></i> View App</a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="content">
+            <!-- Dashboard Tab -->
+            <section id="dashboard-tab" class="tab-content">
+                <h2>Dashboard Overview</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <i class="fas fa-video"></i>
+                        <div class="stat-info">
+                            <span class="stat-value" id="total-videos">0</span>
+                            <span class="stat-label">Total Videos</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-eye"></i>
+                        <div class="stat-info">
+                            <span class="stat-value" id="total-views">0</span>
+                            <span class="stat-label">Total Views</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-download"></i>
+                        <div class="stat-info">
+                            <span class="stat-value" id="total-downloads">0</span>
+                            <span class="stat-label">Downloads</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-users"></i>
+                        <div class="stat-info">
+                            <span class="stat-value" id="active-users">0</span>
+                            <span class="stat-label">Active Users</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="charts-section">
+                    <div class="chart-box">
+                        <h3>Most Viewed Today</h3>
+                        <div id="top-videos-list"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Add Video Tab -->
+            <section id="add-video-tab" class="tab-content hidden">
+                <h2>Add New Video</h2>
+                <form id="add-video-form" class="admin-form">
+                    <div class="form-group">
+                        <label>Video Title</label>
+                        <input type="text" id="video-title" required placeholder="Enter video title">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Category</label>
+                            <select id="video-category"></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Duration (e.g. 12:45)</label>
+                            <input type="text" id="video-duration" placeholder="00:00">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Embed Link (Doodstream/Streamwish)</label>
+                        <input type="url" id="video-embed" required placeholder="https://doodstream.com/e/...">
+                    </div>
+                    <div class="form-group">
+                        <label>Thumbnail URL</label>
+                        <input type="url" id="video-thumb" required placeholder="https://...">
+                    </div>
+                    <div class="form-group">
+                        <label>Download Link</label>
+                        <input type="url" id="video-download" placeholder="Direct download link">
+                    </div>
+                    <div class="form-group">
+                        <label>Tags (comma separated)</label>
+                        <input type="text" id="video-tags" placeholder="movie, action, new">
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="video-desc" rows="4"></textarea>
+                    </div>
+                    <button type="submit" class="btn-submit">Publish Video</button>
+                </form>
+            </section>
+
+            <!-- Manage Videos Tab -->
+            <section id="manage-videos-tab" class="tab-content hidden">
+                <h2>Manage Videos</h2>
+                <div class="table-container">
+                    <table id="videos-table">
+                        <thead>
+                            <tr>
+                                <th>Thumbnail</th>
+                                <th>Title</th>
+                                <th>Category</th>
+                                <th>Views</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="videos-list-body"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Ads Control Tab -->
+            <section id="ads-tab" class="tab-content hidden">
+                <h2>Ads Management</h2>
+                <div class="ads-grid">
+                    <div class="ad-control-card">
+                        <h3>Inline Ads</h3>
+                        <div class="toggle-group">
+                            <span>Enable Inline Ads</span>
+                            <label class="switch">
+                                <input type="checkbox" id="ad-inline-toggle">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        <textarea id="ad-inline-code" placeholder="Paste ad code here (HTML/JS)"></textarea>
+                    </div>
+                    <div class="ad-control-card">
+                        <h3>Play Ads (5s)</h3>
+                        <div class="toggle-group">
+                            <span>Enable Play Ads</span>
+                            <label class="switch">
+                                <input type="checkbox" id="ad-play-toggle">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        <textarea id="ad-play-code" placeholder="Paste ad code here"></textarea>
+                    </div>
+                    <div class="ad-control-card">
+                        <h3>Download Ads</h3>
+                        <div class="toggle-group">
+                            <span>Enable Download Ads</span>
+                            <label class="switch">
+                                <input type="checkbox" id="ad-download-toggle">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        <textarea id="ad-download-code" placeholder="Paste ad code here"></textarea>
+                    </div>
+                    <div class="ad-control-card">
+                        <h3>Overlay Ads</h3>
+                        <div class="toggle-group">
+                            <span>Enable Overlay Ads</span>
+                            <label class="switch">
+                                <input type="checkbox" id="ad-overlay-toggle">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        <textarea id="ad-overlay-code" placeholder="Paste ad code here"></textarea>
+                    </div>
+                </div>
+                <button id="save-ads-btn" class="btn-submit">Save Ads Settings</button>
+            </section>
+
+            <!-- Settings Tab -->
+            <section id="settings-tab" class="tab-content hidden">
+                <h2>App Settings</h2>
+                <form id="settings-form" class="admin-form">
+                    <div class="form-group">
+                        <label>App Name</label>
+                        <input type="text" id="setting-app-name">
+                    </div>
+                    <div class="form-group">
+                        <label>Logo URL</label>
+                        <input type="url" id="setting-logo-url">
+                    </div>
+                    <div class="form-group">
+                        <label>Telegram Channel Link</label>
+                        <input type="url" id="setting-tg-channel">
+                    </div>
+                    <div class="form-group">
+                        <label>Bot Token (for join check)</label>
+                        <input type="text" id="setting-bot-token">
+                    </div>
+                    <div class="form-group">
+                        <label>Theme</label>
+                        <select id="setting-theme">
+                            <option value="dark">Dark Mode</option>
+                            <option value="light">Light Mode</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-submit">Save Settings</button>
+                </form>
+            </section>
+        </main>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>
